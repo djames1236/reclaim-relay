@@ -21,6 +21,7 @@ export default async function handler(req, res) {
 
     const taskData = JSON.parse(bodyString);
 
+    // ✅ Get the token sent from Make via the Authorization header
     const authHeader = req.headers.authorization || '';
     const token = authHeader.replace('Bearer ', '').trim();
 
@@ -28,14 +29,14 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'Missing or invalid token' });
     }
 
-    console.log("🔐 Using token:", token.slice(0, 6) + '...');
+    console.log("🔐 Forwarding token:", token.slice(0, 6) + '...');
 
     const response = await axios.post(
       'https://api.app.reclaim.ai/v1/tasks',
       taskData,
       {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       }
