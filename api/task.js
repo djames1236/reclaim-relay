@@ -8,6 +8,11 @@ export const config = {
 };
 
 export default async function handler(req, res) {
+  console.log("🔥 USING RELAY");
+
+  // ✅ Log the API key to verify it's being loaded correctly (you can redact before pushing public)
+  console.log("🟢 Loaded API Key:", process.env.RECLAIM_API_KEY);
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -16,7 +21,6 @@ export default async function handler(req, res) {
     const rawBody = await buffer(req);
     const sanitized = rawBody.toString().trim();
 
-    console.log("🔥 USING RELAY");
     console.log("Sanitized body string:", sanitized);
 
     const payload = JSON.parse(sanitized);
