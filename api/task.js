@@ -12,6 +12,7 @@ export default async function handler(req, res) {
 
   // ✅ Log the API key to verify it's being loaded correctly (you can redact before pushing public)
   console.log("🟢 Loaded API Key:", process.env.RECLAIM_API_KEY);
+console.log("🔑 Using API Key:", process.env.RECLAIM_API_KEY || '❌ Not set');
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
