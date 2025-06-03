@@ -14,9 +14,11 @@ export default async function handler(req, res) {
 
   try {
     const rawBody = await buffer(req);
-    const rawString = rawBody.toString('utf8');
+    const rawString = rawBody.toString('utf8')
+      .trim()
+      .replace(/[\u0000-\u001F\u007F-\u009F\u200B\u00A0]/g, '');
 
-    console.log("Raw body string:", rawString);
+    console.log("Sanitized body string:", rawString);
 
     let body;
     try {
