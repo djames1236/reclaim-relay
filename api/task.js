@@ -10,9 +10,11 @@ export const config = {
 export default async function handler(req, res) {
   console.log("🔥 USING RELAY");
 
-  // ✅ Log the API key to verify it's being loaded correctly (you can redact before pushing public)
-  console.log("🟢 Loaded API Key:", process.env.RECLAIM_API_KEY);
-console.log("🔑 Using API Key:", process.env.RECLAIM_API_KEY || '❌ Not set');
+  const apiKey = process.env.RECLAIM_API_KEY;
+  console.log("🟢 Loaded API Key:", apiKey);
+  if (!apiKey) {
+    return res.status(500).json({ error: "Missing RECLAIM_API_KEY in environment variables." });
+  }
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -21,22 +23,22 @@ console.log("🔑 Using API Key:", process.env.RECLAIM_API_KEY || '❌ Not set')
   try {
     const rawBody = await buffer(req);
     const sanitized = rawBody.toString().trim();
-
-    console.log("Sanitized body string:", sanitized);
+    console.log("📦 Sanitized Body:", sanitized);
 
     const payload = JSON.parse(sanitized);
+    console.log("🚀 POSTING to https://api.app.reclaim.ai/v1/tasks");
 
-    console.log("🚀 AXIOS POST to https://api.app.reclaim.ai/v1/tasks");
     const response = await axios.post('https://api.app.reclaim.ai/v1/tasks', payload, {
       headers: {
-        'Authorization': `Bearer ${process.env.RECLAIM_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
     });
 
-    res.status(200).json(response.data);
+    console.log("✅ Success:", response.data);
+    return res.status(200).json(response.data);
   } catch (error) {
     console.error("❌ Relay Error:", error.response?.data || error.message);
-    res.status(500).json({ error: error.response?.data || error.message });
+    return res.status(500).json({ error: error.response?.data || error.message });
   }
 }
