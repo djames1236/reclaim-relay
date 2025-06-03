@@ -8,46 +8,30 @@ export const config = {
 };
 
 export default async function handler(req, res) {
-  console.log("🔥 RELAY INVOKED");
-
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
     const rawBody = await buffer(req);
-    const bodyString = rawBody.toString('utf8').trim();
-    console.log("🧼 Sanitized body string:", bodyString);
+    const sanitized = rawBody.toString().trim();
 
-    const taskData = JSON.parse(bodyString);
+    console.log("🔥 USING RELAY");
+    console.log("Sanitized body string:", sanitized);
 
-    // ✅ Get the token sent from Make via the Authorization header
-    const authHeader = req.headers.authorization || '';
-    const token = authHeader.replace('Bearer ', '').trim();
+    const payload = JSON.parse(sanitized);
 
-    if (!token) {
-      return res.status(401).json({ error: 'Missing or invalid token' });
-    }
-
-    console.log("🔐 Forwarding token:", token.slice(0, 6) + '...');
-
-    const response = await axios.post(
-      'https://api.app.reclaim.ai/v1/tasks',
-      taskData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+    console.log("🚀 AXIOS POST to https://api.app.reclaim.ai/v1/tasks");
+    const response = await axios.post('https://api.app.reclaim.ai/v1/tasks', payload, {
+      headers: {
+        'Authorization': `Bearer ${process.env.RECLAIM_API_KEY}`,
+        'Content-Type': 'application/json'
       }
-    );
+    });
 
-    console.log("✅ Reclaim response:", response.data);
-    return res.status(200).json(response.data);
-  } catch (err) {
-    console.error("❌ Relay Error:", err.response?.data || err.message);
-    return res.status(err.response?.status || 500).json(
-      err.response?.data || { error: 'Internal server error' }
-    );
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error("❌ Relay Error:", error.response?.data || error.message);
+    res.status(500).json({ error: error.response?.data || error.message });
   }
 }
