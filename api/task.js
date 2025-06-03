@@ -8,7 +8,7 @@ export const config = {
 };
 
 export default async function handler(req, res) {
-  console.log("🔥 USING AXIOS VERSION OF RELAY");
+  console.log("🔥 RELAY INVOKED");
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -16,35 +16,37 @@ export default async function handler(req, res) {
 
   try {
     const rawBody = await buffer(req);
-    const rawString = rawBody.toString('utf8').trim().replace(/[\u0000-\u001F\u007F-\u009F\u200B\u00A0]/g, '');
-    console.log("📦 Raw incoming payload:", rawString);
+    const bodyString = rawBody.toString('utf8').trim();
+    console.log("🧼 Sanitized body string:", bodyString);
 
-    let body;
-    try {
-      body = JSON.parse(rawString);
-    } catch (parseErr) {
-      console.error("❌ JSON parse error:", parseErr.message);
-      return res.status(400).json({ error: "Invalid JSON in request body" });
+    const taskData = JSON.parse(bodyString);
+
+    const authHeader = req.headers.authorization || '';
+    const token = authHeader.replace('Bearer ', '').trim();
+
+    if (!token) {
+      return res.status(401).json({ error: 'Missing or invalid token' });
     }
 
-    const reclaimEndpoint = 'https://api.app.reclaim.ai/v1/tasks';
-    console.log("🚀 Sending to Reclaim:", reclaimEndpoint);
-    console.log("🔑 Auth Header Present:", Boolean(process.env.RECLAIM_API_KEY));
+    console.log("🔐 Using token:", token.slice(0, 6) + '...');
 
-    const { data } = await axios.post(reclaimEndpoint, body, {
-      headers: {
-        Authorization: `Bearer ${process.env.RECLAIM_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await axios.post(
+      'https://api.app.reclaim.ai/v1/tasks',
+      taskData,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
 
-    console.log("✅ Reclaim response:", data);
-    return res.status(200).json(data);
-
+    console.log("✅ Reclaim response:", response.data);
+    return res.status(200).json(response.data);
   } catch (err) {
-    const errorData = err.response?.data || err.message;
-    const statusCode = err.response?.status || 500;
-    console.error("❌ Relay Error:", errorData);
-    return res.status(statusCode).json({ error: errorData });
+    console.error("❌ Relay Error:", err.response?.data || err.message);
+    return res.status(err.response?.status || 500).json(
+      err.response?.data || { error: 'Internal server error' }
+    );
   }
 }
