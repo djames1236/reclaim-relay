@@ -1,5 +1,5 @@
-// Required for raw body parsing
 import { buffer } from 'micro';
+import fetch from 'node-fetch';
 
 export const config = {
   api: {
@@ -30,7 +30,7 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('Reclaim API error:', data);
+      console.error("Reclaim API error:", data);
       return res.status(response.status).json(data);
     }
 
