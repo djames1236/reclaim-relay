@@ -44,6 +44,7 @@ export default async function handler(req, res) {
       return res.status(response.status).json(data);
     }
 
+    console.log("✅ Reclaim response:", data);
     return res.status(200).json(data);
   } catch (err) {
     console.error('Internal error:', err);
