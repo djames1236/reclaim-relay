@@ -14,9 +14,17 @@ export default async function handler(req, res) {
 
   try {
     const rawBody = await buffer(req);
-    const body = JSON.parse(rawBody.toString());
+    const rawString = rawBody.toString('utf8');
 
-    console.log("Parsed body:", body);
+    console.log("Raw body string:", rawString);
+
+    let body;
+    try {
+      body = JSON.parse(rawString);
+    } catch (jsonError) {
+      console.error("Failed to parse JSON:", jsonError.message);
+      return res.status(400).json({ error: "Invalid JSON in request body" });
+    }
 
     const response = await fetch('https://api.app.reclaim.ai/v1/tasks', {
       method: 'POST',
