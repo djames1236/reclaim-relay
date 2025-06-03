@@ -29,7 +29,7 @@ console.log("🔑 Using API Key:", process.env.RECLAIM_API_KEY || '❌ Not set')
     console.log("🚀 AXIOS POST to https://api.app.reclaim.ai/v1/tasks");
     const response = await axios.post('https://api.app.reclaim.ai/v1/tasks', payload, {
       headers: {
-        'Authorization': `Bearer ${process.env.RECLAIM_API_KEY}`,
+        'Authorization': `Bearer${process.env.RECLAIM_API_KEY}`,
         'Content-Type': 'application/json'
       }
     });
