@@ -8,6 +8,8 @@ export const config = {
 };
 
 export default async function handler(req, res) {
+  console.log("🔥 LIVE TASK.JS INVOKED");
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -18,24 +20,23 @@ export default async function handler(req, res) {
       .trim()
       .replace(/[\u0000-\u001F\u007F-\u009F\u200B\u00A0]/g, '');
 
-    console.log("⚡ Using Reclaim relay");
     console.log("Sanitized body string:", rawString);
 
     let body;
     try {
       body = JSON.parse(rawString);
     } catch (jsonError) {
-      console.error("❌ Failed to parse JSON:", jsonError.message);
+      console.error("❌ JSON parse error:", jsonError.message);
       return res.status(400).json({ error: "Invalid JSON in request body" });
     }
 
-    console.log("✅ Sending POST to: https://api.app.reclaim.ai/v1/tasks");
+    console.log("🚀 POSTING to https://api.app.reclaim.ai/v1/tasks");
 
     const response = await fetch('https://api.app.reclaim.ai/v1/tasks', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${process.env.RECLAIM_API_KEY}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(body)
     });
@@ -50,7 +51,7 @@ export default async function handler(req, res) {
     console.log("✅ Reclaim response:", data);
     return res.status(200).json(data);
   } catch (err) {
-    console.error('❌ Internal error:', err);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error("❌ Internal error:", err);
+    return res.status(500).json({ error: "Internal server error" });
   }
 }
