@@ -27,7 +27,9 @@ export default async function handler(req, res) {
 
     const payload = JSON.parse(sanitized);
     console.log("🚀 POSTING to https://api.app.reclaim.ai/v1/tasks");
-
+console.log("🛠 Full headers:", {
+  Authorization: `Bearer ${process.env.RECLAIM_API_KEY}`
+});
     const response = await axios.post('https://api.app.reclaim.ai/v1/tasks', payload, {
       headers: {
         Authorization: `Bearer ${apiKey}`,
