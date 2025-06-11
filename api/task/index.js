@@ -6,11 +6,10 @@ export default async function handler(req, res) {
   const { title, duration, days, start, end, calendar, overlap, hide } = req.body;
 
   try {
-    const reclaimResponse = await fetch("https://api.reclaim.ai/v1/tasks", {
+    const testResponse = await fetch("https://httpbin.org/post", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.RECLAIM_API_KEY}`,
       },
       body: JSON.stringify({
         title,
@@ -24,14 +23,14 @@ export default async function handler(req, res) {
       }),
     });
 
-    const data = await reclaimResponse.json();
+    const data = await testResponse.json();
 
-    // 👇 LOG the full response so we can see what Reclaim says
-    console.log("Reclaim API response:", reclaimResponse.status, JSON.stringify(data));
+    // 👇 Log the test API response so you can see it in Vercel logs
+    console.log("TEST API response:", testResponse.status, JSON.stringify(data));
 
-    res.status(reclaimResponse.status).json(data);
+    res.status(testResponse.status).json(data);
   } catch (error) {
-    console.error("Error posting to Reclaim:", error);
+    console.error("Error posting to TEST API:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
