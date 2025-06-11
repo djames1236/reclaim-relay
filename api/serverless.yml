@@ -1,1 +1,18 @@
+service: reclaim-relay
+frameworkVersion: '3'
 
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-2
+  environment:
+    RECLAIM_API_KEY: ${env:RECLAIM_API_KEY}
+
+functions:
+  tasks:
+    handler: handler.tasks
+    events:
+      - http:
+          path: tasks
+          method: post
+          cors: true
