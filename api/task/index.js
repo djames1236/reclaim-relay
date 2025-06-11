@@ -26,6 +26,9 @@ export default async function handler(req, res) {
 
     const data = await reclaimResponse.json();
 
+    // 👇 LOG the full response so we can see what Reclaim says
+    console.log("Reclaim API response:", reclaimResponse.status, JSON.stringify(data));
+
     res.status(reclaimResponse.status).json(data);
   } catch (error) {
     console.error("Error posting to Reclaim:", error);
