@@ -6,7 +6,8 @@ export default async function handler(req, res) {
   const { title, duration, days, start, end, calendar, overlap, hide } = req.body;
 
   try {
-    const reclaimResponse = await fetch("https://api.reclaim.ai/v1/tasks", {
+ const reclaimResponse = await fetch("https://api.app.reclaim.ai/v1/tasks", {
+
       method: "POST",
       headers: {
         "Content-Type": "application/json",
